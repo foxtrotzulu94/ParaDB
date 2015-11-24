@@ -1,3 +1,7 @@
+#Eclipse Build files
+*.mk
+*.d
+
 # Object files
 *.o
 *.ko
