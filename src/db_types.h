@@ -30,7 +30,7 @@ typedef struct{
 	unsigned int company_id; //Starts at 1
 	//TODO: FIX. Company name length cannot be hardcoded! and attaching it to this struct is very costly
 	//		if we plan to send an unknown, large number of rows as a result.
-	char* company_name; //Company name is very limited
+//	char* company_name; //Company name is very limited
 	float sales_total;
 } DBRow;
 
@@ -90,7 +90,7 @@ void RowList_recycle(RowList* this);
 //Some helper functions needed to set them up in MPI
 
 //Setup all MPI Datatypes as named in arguments
-void setupDBTypes(MPI_Datatype* date, MPI_Datatype* row, MPI_Datatype* query);
+void setupDBTypes(MPI_Datatype* date, MPI_Datatype* row, MPI_Datatype* query, MPI_Datatype* ext_info);
 
 //Configure and serialize the Date datatype
 void configureDateType(MPI_Datatype* date);

@@ -48,7 +48,7 @@ DBRow readFormattedLine(char* line){
 
 	//Fourth field: company_name
 	//TODO: do strcpy on whatever string gets returned by strtok and assign the pointer to company_name.
-	retVal.company_name = strtok(NULL,"|");
+//	retVal.company_name = strtok(NULL,"|");
 
 	//Last field: sales_amount
 	raw = strtok(NULL,"|");

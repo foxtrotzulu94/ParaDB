@@ -6,15 +6,16 @@
  */
 
 #include "db_types.h"
+#include <stdlib.h>
 
 #ifndef UTILS_MPI_H_
 #define UTILS_MPI_H_
 
 //Initialize the entire ParaDB System
-void DBMS_INIT(DB_Context* handle);
+void DBMS_INIT(DB_Context* handle, int argc, char* argv[]);
 
 //Checks the command line parameters (not including numProcesses). Call before MPI_Init
-void checkArgs(int *argc, char* argv[]);
+int checkArgs(int argc, char* argv[]);
 
 //Sets the MPI_COMM_WORLD and info related to the number of running processes and their rank
 void setWorldInfo(DB_Context* handle);

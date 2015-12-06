@@ -12,9 +12,15 @@
 #include "db_types.h"
 #include "menu.h"
 #include "utils.h"
+#include "utils_mpi.h"
 
 int main(int argc, char* argv[]){
 	//TODO: Cleanup for final solution
+
+	//The context for our entire database
+	DB_Context context;
+
+	DBMS_INIT(&context,argc,argv);
 
 	RowList myList;
 	DBRow aRow;
@@ -50,6 +56,8 @@ int main(int argc, char* argv[]){
 	RowList_terminate(&myList);
 	fclose(myFile);
 	printf("\n\n");
+
+	DBMS_END(&context);
 
 	return 0;
 }
