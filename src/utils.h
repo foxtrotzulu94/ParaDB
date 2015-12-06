@@ -5,6 +5,7 @@
  */
 #include "db_types.h"
 #include <stdio.h>
+#include <stdlib.h>
 /**
  *This file houses all of the utility functions used throughout the program
  *	It includes sorting routines, file reading functions and any general
@@ -13,7 +14,7 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-DBRow* readFromStream(int lineAmount, RowList* output);
+DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output);
 
 DBRow readFormattedLine(char* line);
 

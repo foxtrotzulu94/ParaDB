@@ -63,6 +63,12 @@ void printSalesByDate(DBRow* result, int length){
 	//TODO: Format printing
 }
 
+void printRow(DBRow* row){
+	printf("%u | ",row->sales_id);
+	printDate(row->date);
+	printf(" | %u | %f",row->company_id, row->sales_total);
+}
+
 Date promptDateRange(const char* promptPrefix){
 	Date retVal;
 	int input=0;

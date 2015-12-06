@@ -8,7 +8,7 @@
 #include "db_types.h"
 
 void RowList_init(RowList* aList){
-	aList->capacity=10;
+	aList->capacity=8; //We want to keep this in powers of two
 	aList->size=0;
 	aList->rows = calloc(aList->capacity,sizeof(DBRow));
 }
@@ -29,7 +29,7 @@ void RowList_push_back(RowList* this, DBRow row){
 
 void RowList_terminate(RowList* this){
 	free(this->rows);
-	this->capacity=10;
+	this->capacity=8;
 	this->size=0;
 }
 

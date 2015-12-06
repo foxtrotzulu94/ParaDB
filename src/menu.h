@@ -30,6 +30,8 @@ void printSalesByCompany(DBRow* result, int length);
 
 void printSalesByDate(DBRow* result, int length);
 
+void printRow(DBRow* row);
+
 Date promptDateRange(const char* promptPrefix);
 
 void printDate(Date aDate);
