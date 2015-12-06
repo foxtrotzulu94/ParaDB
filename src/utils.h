@@ -13,7 +13,7 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-DBRow* readFromStream(int lineAmount);
+DBRow* readFromStream(int lineAmount, RowList* output);
 
 DBRow readFormattedLine(char* line);
 

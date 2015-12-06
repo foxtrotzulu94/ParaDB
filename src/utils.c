@@ -7,7 +7,7 @@
 
 #include "utils.h"
 
-DBRow* readFromStream(int lineAmount){
+DBRow* readFromStream(int lineAmount, RowList* output){
 
 	return NULL;
 }

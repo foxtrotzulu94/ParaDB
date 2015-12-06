@@ -59,10 +59,27 @@ void configureDateType(MPI_Datatype* date){
 //Configure and serialize the Database Row datatype
 void configureRowType(MPI_Datatype* date, MPI_Datatype* row){
 	//By now, date should've been initialized
+	const int numElements=5;
+//	int numBlock[5]={
+	//TODO: Fix the Company name problem (see the comment in the typedef DBRows at db_types.h)
 	//TODO: Serialize and commit
 }
 
 //Configure and serialize the Database Query message
-void configureQueryType(MPI_Datatype* date, MPI_Datatype* query){
-	//TODO: Serialize and commit
+void configureQueryType(MPI_Datatype* ext_info,MPI_Datatype* query){
+	const int numElements=2;
+	int numBlocks[2]={1,1};
+	MPI_Aint displacements[2]={offsetof(Query,type),offsetof(Query,conditions)};
+	MPI_Datatype usedTypes[3]={MPI_INT,*ext_info};
+	MPI_Type_create_struct(numElements,numBlocks,displacements,usedTypes,query);
+	MPI_Type_commit(query);
+}
+
+void configureQueryExtendedInfo(MPI_Datatype* date, MPI_Datatype* extended_info){
+	const int numElements=2;
+	int numBlocks[2]={1,1};
+	MPI_Aint displacements[2]={offsetof(ExtendedInfo,startDate),offsetof(ExtendedInfo,endDate)};
+	MPI_Datatype usedTypes[3]={*date,*date};
+	MPI_Type_create_struct(numElements,numBlocks,displacements,usedTypes,extended_info);
+	MPI_Type_commit(extended_info);
 }
