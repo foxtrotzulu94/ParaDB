@@ -36,21 +36,23 @@ void pOdd(DB_Context handle){
 	//Initialize the variables
 	//Make a new dynamic list
 	RowList_init(&myList);
+
 	//Open the file
 	sprintf(filename,"data%d.txt",handle.rank-1);
 	infile = fopen(filename,"r");
+	if(infile==NULL){
+		qlog("DID NOT FIND FILE!");
+		MPI_Abort(MPI_COMM_WORLD,1);
+	}
+
 	//Seed randomness and sound the alarm!
 	srand(time(NULL)+handle.rank);
 	signal(SIGALRM, notifyIncoming);
-
 	alarm(rand()%3 + 3);
 
 
 	//Read some lines. The DB should start with something in its tables!
 	readFromStream(infile,handle.readMax,&myList);
-
-
-
 
 	//Do an initial non-blocking receive
 	//This sets the op_request variable for the polling loop

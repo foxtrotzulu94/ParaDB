@@ -18,11 +18,12 @@ void pEven(DB_Context* handle){
 			inputQuery = requestUserInput();
 		}
 
-//		//We need to add a barrier to synchronize the rest of the processes (Do we?)
+		//We need to add a barrier to synchronize the rest of the processes (Do we?)
 		MPI_Barrier(handle->coworkers); //Might not be necessary
-//
+
 		forwardQuery(handle,&inputQuery); //send it out
 		if(inputQuery.type==EXIT){ break; } //Leave if needed...
+		//TODO: Test the stuff below. We still need to check the reply of the odd processes
 //		queryResults = processQuery(handle,&inputQuery); //... Or get it back
 //
 //		querySorted = bucketSort(handle,queryResults.rows,queryResults.size); //Sort it out with the rest
