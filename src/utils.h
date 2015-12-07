@@ -16,7 +16,7 @@
 
 #define DEBUG_DB 1
 
-DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output);
+DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output, int* id);
 
 DBRow readFormattedLine(char* line);
 

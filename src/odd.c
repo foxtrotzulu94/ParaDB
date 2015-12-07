@@ -34,6 +34,10 @@ void pOdd(DB_Context handle){
 
 
 	//Initialize the variables
+	//Handle the global ones first
+	mustUpdateTable = 0;
+	maxCompanyID = 0;
+
 	//Make a new dynamic list
 	RowList_init(&myList);
 
@@ -52,7 +56,9 @@ void pOdd(DB_Context handle){
 
 
 	//Read some lines. The DB should start with something in its tables!
-	readFromStream(infile,handle.readMax,&myList);
+	readFromStream(infile,handle.readMax,&myList,&maxCompanyID);
+	printf("max company id: %d\n",maxCompanyID);
+	fflush(stdout);
 
 	//Do an initial non-blocking receive
 	//This sets the op_request variable for the polling loop
@@ -72,7 +78,7 @@ void pOdd(DB_Context handle){
 		//if we have to update the table, read some lines and reset the flag
 		if(mustUpdateTable){
 			mustUpdateTable=0;
-			readFromStream(infile,handle.readMax,&myList);
+			readFromStream(infile,handle.readMax,&myList,&maxCompanyID);
 		}
 
 		//If we received a query, handle this one and then do another non-blocking receive
@@ -113,7 +119,7 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 	case SALES_BY_COMPANY:
 		//Route to the routine and then send the results back directly
 		//TODO: COMPLETE. Right now it'll just ACK back
-		findSalesForAllCompanies();
+		findSalesForAllCompanies(table);
 		qlog("found companies");
 		//Just an ACK to test back
 		replyToQuery(context, aQuery,&result,1);
@@ -173,7 +179,10 @@ RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
 }
 
 //Return a list of DBRows (one per company) with the total  amounts of their sales.
-DBRow* findSalesForAllCompanies(){
+DBRow* findSalesForAllCompanies(RowList* table){
 	//TODO: Complete!
+	printf("table has %d rows\n",table->size);
+	printf("max company id is %d\n",maxCompanyID);
+	fflush(stdout);
 	return NULL;
 }

@@ -7,18 +7,27 @@
 
 #include "utils.h"
 
-DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output){
+DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output, int *id){
 	//Temporary variables for our reading
 	char *aLine=NULL;
 
 	size_t len=0;
-
+	printf("%d\n",*id);
+	fflush(stdout);
 
 	int i=0;
 	//Run this loop until we get to the lineAmount or EOF (getline returning 0)
 	for(i=0; i<lineAmount && getline(&aLine, &len,infile);++i){
 		//We can append directly into RowList since it'll dynamically grow.
-		RowList_push_back(output, readFormattedLine(aLine));
+		DBRow readRow = readFormattedLine(aLine);
+		RowList_push_back(output, readRow);
+
+		//Keep track of the largest company size
+		if( (*id) < readRow.company_id){
+			printf("updating %d\n",readRow.company_id);
+			fflush(stdout);
+			(*id) = readRow.company_id;
+		}
 	}
 
 	//Free the used memory

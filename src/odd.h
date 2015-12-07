@@ -29,8 +29,12 @@
 #define ODD_H_
 
 //Global Variables... Only one is needed (luckily)
+
 //Acts as a bool type. "1" is True, "0" is false
 int mustUpdateTable;
+
+//Keeps track of max company_id. Initialize to 0
+int maxCompanyID;
 
 //Our Alarm Signal Handler!
 void notifyIncoming(int sig);
@@ -49,6 +53,6 @@ void replyToQuery(DB_Context* context,Query* aQuery, DBRow* result, int resultLe
 RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table);
 
 //Return a list of DBRows (one per company) with the total  amounts of their sales.
-DBRow* findSalesForAllCompanies();
+DBRow* findSalesForAllCompanies(RowList* table);
 
 #endif /* ODD_H_ */
