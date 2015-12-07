@@ -77,6 +77,8 @@ void pOdd(DB_Context handle){
 
 		//If we received a query, handle this one and then do another non-blocking receive
 		if(receivedQuery){
+			qlog("dispatching query");
+			//Say we have the query
 			if(queryDispatcher(&handle, &incomingQuery)){
 				MPI_Irecv(&incomingQuery,1,handle.query,(handle.rank)-1,0,handle.all,&op_request);
 			}
@@ -97,14 +99,14 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 
 	DBRow result; //TODO: Remove, this is for testing purposes.
 	result.company_id=200; //Signal you're OK!
-
+	qlog("in query");
 	switch(aQuery->type){
 
 	case SALES_BY_COMPANY:
 		//Route to the routine and then send the results back directly
 		//TODO: COMPLETE. Right now it'll just ACK back
 		findSalesForAllCompanies();
-
+		qlog("found companies");
 		//Just an ACK to test back
 		replyToQuery(context, aQuery,&result,1);
 		return 1;
@@ -113,7 +115,7 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 		//Hand off the added info.
 		//TODO: COMPLETE
 		findSalesInDateRange(&(aQuery->conditions));
-
+		qlog("found sales by dates");
 		//This is just an ACK to test back
 		replyToQuery(context, aQuery,&result,1);
 		return 1;
@@ -134,6 +136,7 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 void replyToQuery(DB_Context* context, Query* aQuery, DBRow* result, int resultLength){
 	//Send it down the line with a blocking send
 	MPI_Send(result,resultLength,context->row,context->rank-1,0,context->all);
+	qlog("Reply sent");
 	//TODO: Complete!
 }
 

@@ -45,6 +45,8 @@ void pEven(DB_Context* handle){
 
 	}
 
+	//cleanup the lists before returning to master!
+
 }
 
 //Process the incoming query. Forwards it to the odd process and returns a dynamic list of the results.

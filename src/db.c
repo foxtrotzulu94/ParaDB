@@ -28,6 +28,7 @@ int main(int argc, char* argv[]){
 //
 //	printf("context rank %d\n",context.rank);
 //
+	MPI_Barrier(context.all);
 	if(context.rank%2==0){
 		printf("I'm even, I deal with you! %d\n",context.rank);
 		pEven(&context);
