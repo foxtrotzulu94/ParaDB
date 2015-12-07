@@ -13,6 +13,8 @@
 #include "menu.h"
 #include "utils.h"
 #include "utils_mpi.h"
+#include "odd.h"
+#include "even.h"
 
 int main(int argc, char* argv[]){
 	//TODO: Cleanup for final solution
