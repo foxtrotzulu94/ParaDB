@@ -38,6 +38,7 @@ Query requestUserInput(){
 
 void printQueryInProcess(){
 	printf("Processing Input....");
+	fflush(stdout);
 }
 
 //Prints the resulting DBRows of a given Query

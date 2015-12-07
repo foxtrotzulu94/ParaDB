@@ -11,11 +11,15 @@ void pEven(DB_Context* handle){
 	RowList queryResults;
 	RowList querySorted;
 
+	//Initialize your dynamic lists!
+	RowList_init(&queryResults);
+	RowList_init(&querySorted);
 
 	while(1){
 		//Root shows menu and asks input
 		if(handle->rank==0){
 			inputQuery = requestUserInput();
+			printQueryInProcess();
 		}
 
 		//We need to add a barrier to synchronize the rest of the processes (Do we?)
@@ -23,6 +27,7 @@ void pEven(DB_Context* handle){
 
 		forwardQuery(handle,&inputQuery); //send it out
 		if(inputQuery.type==EXIT){ break; } //Leave if needed...
+
 		//TODO: Test the stuff below. We still need to check the reply of the odd processes
 //		queryResults = processQuery(handle,&inputQuery); //... Or get it back
 //
@@ -32,11 +37,11 @@ void pEven(DB_Context* handle){
 //		if(handle->rank==0){
 //			printQueryResults(inputQuery,querySorted.rows,querySorted.size);
 //		}
-//
-//
-//		//Recycle the used types
-//		RowList_recycle(&queryResults);
-//		RowList_recycle(&querySorted);
+
+
+		//Recycle the used types
+		RowList_recycle(&queryResults);
+		RowList_recycle(&querySorted);
 
 	}
 
