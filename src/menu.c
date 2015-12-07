@@ -44,6 +44,23 @@ void printQueryInProcess(){
 //Prints the resulting DBRows of a given Query
 void printQueryResults(Query query, DBRow* result, int length){
 	//TODO: Format printing
+	printf("\nReturned %d rows\n\n",length);
+	fflush(stdout);
+	switch(query.type){
+	case SALES_BY_COMPANY:
+		printSalesByAllCompanies(result,length);
+		break;
+	case SALES_BY_DATE:
+		printSalesByDate(result,length);
+		break;
+	case EXIT:
+		safeWrite("\nThank you for using ParaDB... Good Bye!");
+		break;
+	default:
+		safeWrite("The response to the query was not understood. Was something corrupted?");
+		return;
+	}
+	safeWrite("\nQuery complete\n\n");
 }
 
 //Prints the entire menu to console.
@@ -59,7 +76,7 @@ void drawMenu(){
 
 void printSalesByAllCompanies(DBRow* result, int length){
 	//TODO: Change for company names when available!
-	printf("Company\tTotal\n\n");
+	printf("Company\t\tTotal\n\n");
 	fflush(stdout);
 	int i=0;
 	for(i=0;i<length;++i){
@@ -69,13 +86,19 @@ void printSalesByAllCompanies(DBRow* result, int length){
 
 void printCompanySales(DBRow* result){
 	//TODO: CHANGE for company name when possible!
-	printf("%d\t%f",result->company_id,result->sales_total);
+	printf("%d\t\t%f",result->company_id,result->sales_total);
 	fflush(stdout);
 }
 
 void printSalesByDate(DBRow* result, int length){
-	//TODO: Format printing
-
+	printf("YYYY/MM/DD\t\tTotal\n\n");
+	fflush(stdout);
+	int i=0;
+	for(i=0;i<length;++i){
+		printDate(result->date);
+		printf("\t\t%f\n",result->sales_total);
+	}
+	fflush(stdout);
 }
 
 void printRow(DBRow* row){

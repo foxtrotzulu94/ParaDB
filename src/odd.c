@@ -99,6 +99,10 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 
 	DBRow result; //TODO: Remove, this is for testing purposes.
 	result.company_id=200; //Signal you're OK!
+	result.date.year=1994;
+	result.date.month=	9;
+	result.date.day=29;
+
 	qlog("in query");
 	switch(aQuery->type){
 
@@ -136,6 +140,7 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 void replyToQuery(DB_Context* context, Query* aQuery, DBRow* result, int resultLength){
 	//Send it down the line with a blocking send
 	MPI_Send(result,resultLength,context->row,context->rank-1,0,context->all);
+	printf("sent %d elements\n",resultLength);
 	qlog("Reply sent");
 	//TODO: Complete!
 }

@@ -19,7 +19,12 @@ void pEven(DB_Context* handle){
 		//Root shows menu and asks input
 		if(handle->rank==0){
 			inputQuery = requestUserInput();
-			printQueryInProcess();
+			if(inputQuery.type==EXIT){
+				safeWrite("\nThank you for using ParaDB... Good Bye!");
+			}
+			else{
+				printQueryInProcess();
+			}
 		}
 
 		//We need to add a barrier to synchronize the rest of the processes (Do we?)
@@ -29,14 +34,15 @@ void pEven(DB_Context* handle){
 		if(inputQuery.type==EXIT){ break; } //Leave if needed...
 
 		//TODO: Test the stuff below. We still need to check the reply of the odd processes
-//		queryResults = processQuery(handle,&inputQuery); //... Or get it back
+		queryResults = processQuery(handle,&inputQuery); //... Or get it back
 //
 //		querySorted = bucketSort(handle,queryResults.rows,queryResults.size); //Sort it out with the rest
 //
 //		//Root delivers!
-//		if(handle->rank==0){
-//			printQueryResults(inputQuery,querySorted.rows,querySorted.size);
-//		}
+		if(handle->rank==0){
+//			printQueryResults(inputQuery,querySorted.rows,querySorted.size); //use this when it's passed through Bucket Sort
+			printQueryResults(inputQuery,queryResults.rows,queryResults.size);
+		}
 
 
 		//Recycle the used types
@@ -65,10 +71,13 @@ RowList processQuery(DB_Context* handle, Query* aQuery){
 
 	//Now we're ready for that message
 	MPI_Recv(response,responseSize,handle->row,(handle->rank)+1,0,handle->all,&op_status);
-
+	printf("even received %d\n",responseSize);
 	//Make it into a high level format
-	RowList_fit(&retVal,response,responseSize);
-
+//	RowList_fit(&retVal,response,responseSize);
+	retVal.capacity=responseSize;
+	retVal.size=responseSize;
+	retVal.rows = response;
+	//It's not returning the list correctly!
 	return retVal;
 }
 
