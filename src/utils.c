@@ -48,7 +48,8 @@ DBRow readFormattedLine(char* line){
 
 	//Fourth field: company_name
 	//TODO: do strcpy on whatever string gets returned by strtok and assign the pointer to company_name.
-//	retVal.company_name = strtok(NULL,"|");
+//	retVal.company_name = //TODO: Just uncomment when you have the name
+			strtok(NULL,"|");
 
 	//Last field: sales_amount
 	raw = strtok(NULL,"|");
@@ -81,6 +82,42 @@ int compareDates(const void * a, const void * b){
 	//Read them as Date structs
 	aDate = (Date*)&(aRow->date);
 	bDate = (Date*)&(bRow->date);
+
+	if(aDate->year < bDate->year){
+		retVal=-1;
+	}
+	else if(aDate->year > bDate->year){
+		retVal = 1;
+	}
+	else{ //Years must be the same
+		if(aDate->month < bDate->month){
+			retVal=-1;
+		}
+		else if(aDate->month > bDate->month){
+			retVal = 1;
+		}
+		else{ //Months must be the same
+			if(aDate->day < bDate->day){
+				retVal=-1;
+			}
+			else if(aDate->day > bDate->day){
+				retVal = 1;
+			}
+			else{
+				return 0;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+int compareDatesExclusive(const void * a, const void * b){
+	Date* aDate,*bDate;
+	int retVal=0;
+	//Read them as Date structs
+	aDate = (Date*)a;
+	bDate = (Date*)b;
 
 	if(aDate->year < bDate->year){
 		retVal=-1;

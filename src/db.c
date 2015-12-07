@@ -3,7 +3,7 @@
  Name        : db.c
  Author      : Javier E. Fajardo
  Version     :
- Copyright   : 
+ Copyright   :
  ============================================================================
  */
 #include <stdio.h>
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]){
 	DB_Context context;
 	printf("DON'T WORRY ABOUT THE MAKE FILE!");
 	printf("Initializing");
-	DBMS_INIT(&context,argc,argv); //PROBLEM IN HERE!
+	DBMS_INIT(&context,argc,argv);
 //	printf("finished");
 //
 //	printf("context rank %d\n",context.rank);

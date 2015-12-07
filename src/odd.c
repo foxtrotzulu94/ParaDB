@@ -79,7 +79,7 @@ void pOdd(DB_Context handle){
 		if(receivedQuery){
 			qlog("dispatching query");
 			//Say we have the query
-			if(queryDispatcher(&handle, &incomingQuery)){
+			if(queryDispatcher(&handle, &incomingQuery, &myList)){
 				MPI_Irecv(&incomingQuery,1,handle.query,(handle.rank)-1,0,handle.all,&op_request);
 			}
 			else{
@@ -94,7 +94,7 @@ void pOdd(DB_Context handle){
 }
 
 //Deals with the incoming query
-int queryDispatcher(DB_Context* context, Query* aQuery){
+int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 	//Let's take a look at the query type
 
 	DBRow result; //TODO: Remove, this is for testing purposes.
@@ -104,6 +104,10 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 	result.date.day=29;
 
 	qlog("in query");
+
+
+	RowList matchingRows;
+
 	switch(aQuery->type){
 
 	case SALES_BY_COMPANY:
@@ -117,11 +121,11 @@ int queryDispatcher(DB_Context* context, Query* aQuery){
 
 	case SALES_BY_DATE:
 		//Hand off the added info.
-		//TODO: COMPLETE
-		findSalesInDateRange(&(aQuery->conditions));
+		//TODO: we're debugging this. it should be straightforward to return
+		matchingRows = findSalesInDateRange(&(aQuery->conditions),table);
 		qlog("found sales by dates");
-		//This is just an ACK to test back
-		replyToQuery(context, aQuery,&result,1);
+
+		replyToQuery(context, aQuery,matchingRows.rows,matchingRows.size);
 		return 1;
 
 	case EXIT:
@@ -142,13 +146,28 @@ void replyToQuery(DB_Context* context, Query* aQuery, DBRow* result, int resultL
 	MPI_Send(result,resultLength,context->row,context->rank-1,0,context->all);
 	printf("sent %d elements\n",resultLength);
 	qlog("Reply sent");
-	//TODO: Complete!
+	//TODO: Complete! //I think this is done by now :/
 }
 
 //Find all sales matching the Query's Extended Info. Return a RowList of these entries
-RowList findSalesInDateRange(ExtendedInfo* dates){
+RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
 	//TODO: Complete!
 	RowList retVal;
+	RowList_init(&retVal);
+	printf("table has %d rows\n",table->size);
+	fflush(stdout);
+	int i=0;
+	for(i=0;i<table->size;++i){
+		//Use the utils compare function for this
+		//Date has to be larger than or equal to startDate and less than or equal to endDate
+		//This translates to startCompare!=-1 && endCompare!=1
+		if(compareDatesExclusive(&(table->rows[i].date),&(dates->startDate))!=-1 && compareDatesExclusive(&(table->rows[i].date),&(dates->endDate))!=1){
+			//Entry is good, Append!
+			RowList_push_back(&retVal,table->rows[i]);
+		}
+	}
+	printf("reply has %d rows\n",retVal.size);
+		fflush(stdout);
 
 	return retVal;
 }

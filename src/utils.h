@@ -23,6 +23,8 @@ DBRow readFormattedLine(char* line);
 //Used to compare dates by qsort
 int compareDates(const void * a, const void * b);
 
+int compareDatesExclusive(const void * a, const void * b);
+
 //Used to compare Companies by qsort
 int compareCompanies(const void * a, const void * b);
 

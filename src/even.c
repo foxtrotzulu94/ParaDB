@@ -73,10 +73,10 @@ RowList processQuery(DB_Context* handle, Query* aQuery){
 	MPI_Recv(response,responseSize,handle->row,(handle->rank)+1,0,handle->all,&op_status);
 	printf("even received %d\n",responseSize);
 	//Make it into a high level format
-//	RowList_fit(&retVal,response,responseSize);
-	retVal.capacity=responseSize;
-	retVal.size=responseSize;
-	retVal.rows = response;
+	RowList_fit(&retVal,response,responseSize);
+//	retVal.capacity=responseSize;
+//	retVal.size=responseSize;
+//	retVal.rows = response;
 	//It's not returning the list correctly!
 	return retVal;
 }

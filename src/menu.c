@@ -82,6 +82,7 @@ void printSalesByAllCompanies(DBRow* result, int length){
 	for(i=0;i<length;++i){
 		printCompanySales(&(result[i]));
 	}
+	safeWrite("\n");
 }
 
 void printCompanySales(DBRow* result){

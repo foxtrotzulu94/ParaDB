@@ -39,14 +39,14 @@ void notifyIncoming(int sig);
 void pOdd(DB_Context handle);
 
 //Deals with the incoming query. Returns 0 if there's no need to listen for a new Query.
-int queryDispatcher(DB_Context* context,Query* aQuery);
+int queryDispatcher(DB_Context* context,Query* aQuery, RowList* table);
 
 //Sends the results of a query back to the Even Numbered Process.
 //If we were doing IPC, we'd do it here
 void replyToQuery(DB_Context* context,Query* aQuery, DBRow* result, int resultLength);
 
 //Find all sales matching the Query's Extended Info. Return a RowList of these entries
-RowList findSalesInDateRange(ExtendedInfo* dates);
+RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table);
 
 //Return a list of DBRows (one per company) with the total  amounts of their sales.
 DBRow* findSalesForAllCompanies();
