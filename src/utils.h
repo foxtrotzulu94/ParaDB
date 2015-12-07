@@ -14,10 +14,12 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+#define DEBUG_DB 1
+
 DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output);
 
 DBRow readFormattedLine(char* line);
 
-
+void qlog(char* something);
 
 #endif /* UTILS_H_ */

@@ -36,7 +36,7 @@ int mustUpdateTable;
 void notifyIncoming(int sig);
 
 //Main Function for all odd numbered processes
-void pOdd(DB_Context* handle);
+void pOdd(DB_Context handle);
 
 //Deals with the incoming query. Returns 0 if there's no need to listen for a new Query.
 int queryDispatcher(DB_Context* context,Query* aQuery);

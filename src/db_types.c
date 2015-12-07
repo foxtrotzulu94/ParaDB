@@ -47,6 +47,13 @@ void setupDBTypes(MPI_Datatype* date, MPI_Datatype* row, MPI_Datatype* query, MP
 	configureQueryExtendedInfo(date,ext_info);
 }
 
+//Force the RowList to initialize to the given parameters.
+void RowList_fit(RowList* this, DBRow* rows, int length){
+	this->rows=rows;
+	this->size=length;
+	this->capacity=length;
+}
+
 //Configure and serialize the Date datatype
 void configureDateType(MPI_Datatype* date){
 	//Recycled from Assignment 3

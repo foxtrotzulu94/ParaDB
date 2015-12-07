@@ -23,10 +23,13 @@ void printQueryInProcess();
 //Prints the resulting DBRows of a given Query
 void printQueryResults(Query query, DBRow* result, int length);
 
+//Prints a single Company
+void printCompanySales(DBRow* result);
+
 //Prints the entire menu to console.
 void drawMenu();
 
-void printSalesByCompany(DBRow* result, int length);
+void printSalesByAllCompanies(DBRow* result, int length);
 
 void printSalesByDate(DBRow* result, int length);
 
@@ -35,5 +38,8 @@ void printRow(DBRow* row);
 Date promptDateRange(const char* promptPrefix);
 
 void printDate(Date aDate);
+
+//Safely write and flush output stream!
+void safeWrite(char* output);
 
 #endif /* MENU_H_ */

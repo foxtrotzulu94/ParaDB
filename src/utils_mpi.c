@@ -9,11 +9,12 @@
 
 //Initialize the entire ParaDB System
 void DBMS_INIT(DB_Context* handle, int argc, char* argv[]){
+	MPI_Init(&argc,&argv);
+
 	//First, check and set the args
 	handle->readMax = checkArgs(argc,argv);
 
 	//Now get info about our world
-	MPI_Init(&argc,&argv);
 	setWorldInfo(handle);
 
 	//Set the new communicators
@@ -29,6 +30,7 @@ void DBMS_INIT(DB_Context* handle, int argc, char* argv[]){
 int checkArgs(int argc, char* argv[]){
 	//Check that only two arguments were provided. This should be the name of the program and "readmax"
 	if(argc!=2){
+		MPI_Abort(MPI_COMM_WORLD,1);
 		abort();
 	}
 
@@ -36,6 +38,7 @@ int checkArgs(int argc, char* argv[]){
 	int retVal =atoi(argv[1]);
 	if(retVal<=0){
 		//Stop executing the program if the parameter is 0 or less
+		MPI_Abort(MPI_COMM_WORLD,1);
 		abort();
 	}
 
@@ -56,6 +59,15 @@ void setWorldInfo(DB_Context* handle){
 		}
 		MPI_Abort(MPI_COMM_WORLD,1);
 		abort();
+	}
+	if((handle->processes)%2==1){
+		if(handle->rank==0){
+			printf("Cannot run with an uneven number of processes!\n");
+			printf("Each Compute node is expected to have 2 processes");
+			printf("Maybe you just missed the \"-npernode 2\" argument when you did mpirun?");
+			MPI_Abort(MPI_COMM_WORLD,1);
+			abort();
+		}
 	}
 }
 

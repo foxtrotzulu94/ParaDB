@@ -65,6 +65,12 @@ DBRow readFormattedLine(char* line){
 	retVal.date.day = atoi(raw);
 
 	//The object should be done by this point
-
 	return retVal;
+}
+
+void qlog(char* something){
+#if DEBUG_DB
+	printf("%s\n",something);
+	fflush(stdout);
+#endif
 }

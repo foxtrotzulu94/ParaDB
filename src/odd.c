@@ -9,12 +9,19 @@ void notifyIncoming(int sig){
 	//The signal came in. We need to update the table
 	mustUpdateTable = 1;
 
+	//TODO: Remove debug log
+//	qlog("update");
+
 	//More Importantly, set a random time interval between 3 and 5 seconds for the next alarm
 	alarm(rand()%3 + 3);
 }
 
 //Main Function for all odd numbered processes
-void pOdd(DB_Context* handle){
+void pOdd(DB_Context handle){
+	//TODO: Remove debug log
+//	printf("%d",handle.rank);
+//	qlog("Starting odd_main");
+
 	//Setup some of the working variables
 	char 	filename[50];
 	FILE*	infile;
@@ -30,20 +37,24 @@ void pOdd(DB_Context* handle){
 	//Make a new dynamic list
 	RowList_init(&myList);
 	//Open the file
-	sprintf(filename,"data%d.txt",handle->rank);
-	infile = open(&filename,"r");
+	sprintf(filename,"data%d.txt",handle.rank-1);
+	infile = fopen(filename,"r");
 	//Seed randomness and sound the alarm!
-	srand(time(NULL)+handle->rank);
+	srand(time(NULL)+handle.rank);
 	signal(SIGALRM, notifyIncoming);
+
 	alarm(rand()%3 + 3);
 
 
 	//Read some lines. The DB should start with something in its tables!
-	readFromStream(infile,handle->readMax,&myList);
+	readFromStream(infile,handle.readMax,&myList);
+
+
+
 
 	//Do an initial non-blocking receive
 	//This sets the op_request variable for the polling loop
-	MPI_Irecv(&incomingQuery,1,handle->query,(handle->rank)-1,0,handle->all,&op_request);
+	MPI_Irecv(&incomingQuery,1,handle.query,(handle.rank)-1,0,handle.all,&op_request);
 
 
 	////////////
@@ -55,16 +66,17 @@ void pOdd(DB_Context* handle){
 			MPI_Test(&op_request,&receivedQuery,&op_status);
 		}while(receivedQuery==0 || mustUpdateTable==0);
 
+
 		//if we have to update the table, read some lines and reset the flag
 		if(mustUpdateTable){
 			mustUpdateTable=0;
-			readFromStream(infile,handle->readMax,&myList);
+			readFromStream(infile,handle.readMax,&myList);
 		}
 
 		//If we received a query, handle this one and then do another non-blocking receive
 		if(receivedQuery){
-			if(queryDispatcher(handle, &incomingQuery)){
-				MPI_Irecv(&incomingQuery,1,handle->query,(handle->rank)-1,0,handle->all,&op_request);
+			if(queryDispatcher(&handle, &incomingQuery)){
+				MPI_Irecv(&incomingQuery,1,handle.query,(handle.rank)-1,0,handle.all,&op_request);
 			}
 			else{
 				//If the Query was an exit message. Cleanup and return to main!

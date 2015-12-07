@@ -52,21 +52,36 @@ void drawMenu(){
 	printf("\t2. Sales By Date\n");
 	printf("\t3. Exit\n\n");
 	printf("Option: ");
+	fflush(stdout);
 	//Return control to the Request User Input menu
 }
 
-void printSalesByCompany(DBRow* result, int length){
-	//TODO: Format printing
+void printSalesByAllCompanies(DBRow* result, int length){
+	//TODO: Change for company names when available!
+	printf("Company\tTotal\n\n");
+	fflush(stdout);
+	int i=0;
+	for(i=0;i<length;++i){
+		printCompanySales(&(result[i]));
+	}
+}
+
+void printCompanySales(DBRow* result){
+	//TODO: CHANGE for company name when possible!
+	printf("%d\t%f",result->company_id,result->sales_total);
+	fflush(stdout);
 }
 
 void printSalesByDate(DBRow* result, int length){
 	//TODO: Format printing
+
 }
 
 void printRow(DBRow* row){
 	printf("%u | ",row->sales_id);
 	printDate(row->date);
 	printf(" | %u | %f",row->company_id, row->sales_total);
+	fflush(stdout);
 }
 
 Date promptDateRange(const char* promptPrefix){
@@ -75,6 +90,7 @@ Date promptDateRange(const char* promptPrefix){
 
 	//Ask for year and default to 2015
 	printf("Enter %s Year: ", promptPrefix);
+	fflush(stdout);
 	scanf("%d",&input);
 	if(input<1900 || input > 2020){
 		input=2015;
@@ -82,6 +98,7 @@ Date promptDateRange(const char* promptPrefix){
 	retVal.year=input;
 
 	printf("Enter %s Month: ", promptPrefix);
+	fflush(stdout);
 	scanf("%d",&input);
 	if(input<1 || input >12){
 		input =12;
@@ -89,6 +106,7 @@ Date promptDateRange(const char* promptPrefix){
 	retVal.month=input;
 
 	printf("Enter %s Day: ", promptPrefix);
+	fflush(stdout);
 	scanf("%d",&input);
 	if(input<1 || input>31){
 		input = 7;
@@ -99,4 +117,11 @@ Date promptDateRange(const char* promptPrefix){
 
 void printDate(Date aDate){
 	printf("%d/%d/%d",aDate.year,aDate.month,aDate.day);
+	fflush(stdout);
+}
+
+//Safely write and flush output stream!
+void safeWrite(char* output){
+	printf("%s",output);
+	fflush(stdout);
 }

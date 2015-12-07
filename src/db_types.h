@@ -85,7 +85,8 @@ void RowList_terminate(RowList* this);
 //Terminate and Reinit the list for reusing the same pointer later.
 void RowList_recycle(RowList* this);
 
-
+//Force the RowList to initialize to the given parameters.
+void RowList_fit(RowList* this, DBRow* rows, int length);
 
 //Some helper functions needed to set them up in MPI
 
