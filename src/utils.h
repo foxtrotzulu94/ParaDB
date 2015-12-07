@@ -20,6 +20,12 @@ DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output);
 
 DBRow readFormattedLine(char* line);
 
+//Used to compare dates by qsort
+int compareDates(const void * a, const void * b);
+
+//Used to compare Companies by qsort
+int compareCompanies(const void * a, const void * b);
+
 void qlog(char* something);
 
 #endif /* UTILS_H_ */

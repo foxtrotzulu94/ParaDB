@@ -92,7 +92,7 @@ Date promptDateRange(const char* promptPrefix){
 	printf("Enter %s Year: ", promptPrefix);
 	fflush(stdout);
 	scanf("%d",&input);
-	if(input<1900 || input > 2020){
+	if(input<1800 || input > 2020){
 		input=2015;
 	}
 	retVal.year=input;

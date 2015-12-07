@@ -68,6 +68,60 @@ DBRow readFormattedLine(char* line){
 	return retVal;
 }
 
+//Used to compare dates by qsort
+int compareDates(const void * a, const void * b){
+	int retVal=0;	//if a<b -> -1, a==b -> 0, a>b -> 1
+	Date *aDate,*bDate;
+	DBRow *aRow,*bRow;
+
+	//Read as DBRows
+	aRow = (DBRow*)a;
+	bRow = (DBRow*)b;
+
+	//Read them as Date structs
+	aDate = (Date*)&(aRow->date);
+	bDate = (Date*)&(bRow->date);
+
+	if(aDate->year < bDate->year){
+		retVal=-1;
+	}
+	else if(aDate->year > bDate->year){
+		retVal = 1;
+	}
+	else{ //Years must be the same
+		if(aDate->month < bDate->month){
+			retVal=-1;
+		}
+		else if(aDate->month > bDate->month){
+			retVal = 1;
+		}
+		else{ //Months must be the same
+			if(aDate->day < bDate->day){
+				retVal=-1;
+			}
+			else if(aDate->day > bDate->day){
+				retVal = 1;
+			}
+			else{
+				return 0;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+//Used to compare Companies by qsort
+int compareCompanies(const void * a, const void * b){
+	DBRow *aRow,*bRow;
+
+	//Read as DBRows
+	aRow = (DBRow*)a;
+	bRow = (DBRow*)b;
+
+	return (aRow->company_id)-(bRow->company_id);
+}
+
 void qlog(char* something){
 #if DEBUG_DB
 	printf("%s\n",something);
