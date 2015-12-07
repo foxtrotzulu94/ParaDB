@@ -57,10 +57,11 @@ void printQueryResults(Query query, DBRow* result, int length){
 		safeWrite("\nThank you for using ParaDB... Good Bye!");
 		break;
 	default:
-		safeWrite("The response to the query was not understood. Was something corrupted?");
+		safeWrite("Query ERROR");
 		return;
 	}
-	safeWrite("\nQuery complete\n\n");
+	printf("\nQuery OK (%d rows)\n\n",length);
+	fflush(stdout);
 }
 
 //Prints the entire menu to console.
@@ -96,8 +97,8 @@ void printSalesByDate(DBRow* result, int length){
 	fflush(stdout);
 	int i=0;
 	for(i=0;i<length;++i){
-		printDate(result->date);
-		printf("\t\t%f\n",result->sales_total);
+		printDate(result[i].date);
+		printf("\t\t%f\n",result[i].sales_total);
 	}
 	fflush(stdout);
 }
