@@ -42,9 +42,9 @@ void RowList_recycle(RowList *this){
 //Setup all MPI Datatypes as named in arguments
 void setupDBTypes(MPI_Datatype* date, MPI_Datatype* row, MPI_Datatype* query, MPI_Datatype* ext_info){
 	configureDateType(date);
-	configureQueryType(date,query);
 	configureRowType(date,row);
 	configureQueryExtendedInfo(date,ext_info);
+	configureQueryType(ext_info,query);
 }
 
 //Force the RowList to initialize to the given parameters.
@@ -83,7 +83,7 @@ void configureQueryType(MPI_Datatype* ext_info,MPI_Datatype* query){
 	const int numElements=2;
 	int numBlocks[2]={1,1};
 	MPI_Aint displacements[2]={offsetof(Query,type),offsetof(Query,conditions)};
-	MPI_Datatype usedTypes[3]={MPI_INT,*ext_info};
+	MPI_Datatype usedTypes[2]={MPI_INT,*ext_info};
 	MPI_Type_create_struct(numElements,numBlocks,displacements,usedTypes,query);
 	MPI_Type_commit(query);
 }
@@ -93,7 +93,7 @@ void configureQueryExtendedInfo(MPI_Datatype* date, MPI_Datatype* extended_info)
 	const int numElements=2;
 	int numBlocks[2]={1,1};
 	MPI_Aint displacements[2]={offsetof(ExtendedInfo,startDate),offsetof(ExtendedInfo,endDate)};
-	MPI_Datatype usedTypes[3]={*date,*date};
+	MPI_Datatype usedTypes[2]={*date,*date};
 	MPI_Type_create_struct(numElements,numBlocks,displacements,usedTypes,extended_info);
 	MPI_Type_commit(extended_info);
 }
