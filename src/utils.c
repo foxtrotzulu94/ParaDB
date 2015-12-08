@@ -13,8 +13,6 @@ DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output, int *id){
 	char *aLine=NULL;
 
 	size_t len=0;
-	printf("%d\n",*id);
-	fflush(stdout);
 
 	int i=0;
 	//Run this loop until we get to the lineAmount or EOF (getline returning 0)
@@ -25,8 +23,6 @@ DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output, int *id){
 
 		//Keep track of the largest company size
 		if( (*id) < readRow.company_id){
-			printf("updating %d\n",readRow.company_id);
-			fflush(stdout);
 			(*id) = readRow.company_id;
 		}
 	}
@@ -57,8 +53,6 @@ DBRow readFormattedLine(char* line){
 	retVal.company_id = atoi(raw);
 
 	//Fourth field: company_name
-	//TODO: do strcpy on whatever string gets returned by strtok and assign the pointer to company_name.
-//	retVal.company_name = //TODO: Just uncomment when you have the name
 	raw=strtok(NULL,"|");
 	strncpy(&retVal.company_name,raw,49);
 	retVal.company_name[49]='\0'; //Gotta add that null char!

@@ -92,14 +92,6 @@ void pOdd(DB_Context handle){
 //Deals with the incoming query
 int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 	//Let's take a look at the query type
-
-	DBRow result; //TODO: Remove, this is for testing purposes.
-	result.company_id=200; //Signal you're OK!
-	result.date.year=1994;
-	result.date.month=	9;
-	result.date.day=29;
-
-
 	RowList matchingRows;
 
 	switch(aQuery->type){

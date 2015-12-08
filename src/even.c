@@ -42,24 +42,14 @@ void pEven(DB_Context* handle){
 		}
 
 
-		//Recycle the used types
-		//TODO: Think this one through a bit better. BucketSort will likely return new lists that need to be recycled
-//		RowList_terminate(&queryResults);
-//
-//		if(handle->rank==0){
-//
-//			RowList_terminate(&querySorted);
-//		}
-		//TODO: Remove these leaky statements!
-//		RowList_recycle(&queryResults);
-//		RowList_recycle(&querySorted);
+		//cleanup before finishing query
+		if(queryResults.size)
+			RowList_terminate(&queryResults);
+		if(querySorted.size && querySorted.rows!=queryResults.rows)
+			RowList_terminate(&querySorted);
 	}
 
-	//cleanup the lists before returning to master!
-	if(queryResults.size)
-		RowList_terminate(&queryResults);
-	if(querySorted.size && querySorted.rows!=queryResults.rows)
-		RowList_terminate(&querySorted);
+
 }
 
 //Process the incoming query. Forwards it to the odd process and returns a dynamic list of the results.
@@ -229,7 +219,7 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 			printf("Expecting %d from P%d\n",expectedReceiveSize[i],i);
 			fflush(stdout);
 			if(i<evenProcessCount-1){ //And also calculate the displacements.
-				offsetsReceive[i+1]=expectedReceiveSize[i]+offsetsReceive[i]; //TODO: Double check if that -1 causes any trouble or not :/
+				offsetsReceive[i+1]=expectedReceiveSize[i]+offsetsReceive[i];
 			}
 		}
 		finals = calloc(expectedBufferSize,sizeof(DBRow));
