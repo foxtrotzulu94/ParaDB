@@ -6,6 +6,7 @@
 #include "db_types.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 /**
  *This file houses all of the utility functions used throughout the program
  *	It includes sorting routines, file reading functions and any general
@@ -28,6 +29,16 @@ int compareDatesExclusive(const void * a, const void * b);
 //Used to compare Companies by qsort
 int compareCompanies(const void * a, const void * b);
 
+//Returns milliseconds from Epoch for given date
+long long convertDateToEpoch(Date* date);
+
+//Returns a Date struct for a particular millisecond representation of Epoch
+Date convertEpochToDate(long long epochTime);
+
+//Return the parameters to do an all to all
+void getAllToAllParameters(long long start, long long end, int divisions, DBRow* list, int listLenght, int* outAmounts, int* outOffsets);
+
 void qlog(char* something);
+
 
 #endif /* UTILS_H_ */

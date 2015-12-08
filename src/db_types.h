@@ -89,7 +89,6 @@ void RowList_recycle(RowList* this);
 void RowList_fit(RowList* this, DBRow* rows, int length);
 
 //Some helper functions needed to set them up in MPI
-
 //Setup all MPI Datatypes as named in arguments
 void setupDBTypes(MPI_Datatype* date, MPI_Datatype* row, MPI_Datatype* query, MPI_Datatype* ext_info);
 

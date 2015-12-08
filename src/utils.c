@@ -6,6 +6,7 @@
 
 
 #include "utils.h"
+#include "menu.h" //TODO: REMOVE!
 
 DBRow* readFromStream(FILE* infile, int lineAmount, RowList* output, int *id){
 	//Temporary variables for our reading
@@ -166,6 +167,74 @@ int compareCompanies(const void * a, const void * b){
 	bRow = (DBRow*)b;
 
 	return (aRow->company_id)-(bRow->company_id);
+}
+
+//Returns milliseconds from Epoch for given date
+long long convertDateToEpoch(Date* date){
+	long long  retVal;
+	struct tm cDate = {0};
+	time_t epochTime = {0};
+
+	cDate.tm_year = (date->year)-1900;
+	cDate.tm_mon = (date->month)-1;
+	cDate.tm_mday = date->day;
+	printf("converting from %s\n",asctime(&cDate));
+	epochTime = mktime(&cDate);
+
+	retVal = (long long) epochTime;
+	return retVal;
+}
+
+//Returns a Date struct for a particular millisecond representation of Epoch
+Date convertEpochToDate(long long epochTime){
+	Date retVal;
+	struct tm *datePtr;
+	time_t cTime = (time_t)epochTime;
+
+	datePtr = localtime(&cTime);
+	retVal.year = datePtr->tm_year + 1900;
+	retVal.month = datePtr->tm_mon + 1;
+	retVal.day = datePtr->tm_mday;
+
+	return retVal;
+}
+
+//Return the parameters to do an all to all
+void getAllToAllParameters(long long start, long long end, int divisions, DBRow* list, int listLength, int* outAmounts, int* outOffsets){
+	//Adapted from our assignment 3
+	//We've once more assumed that outAmounts and outOffsets are of "divisions" length
+	long long timeLimits = (end-start)/divisions;
+	printf("time limits %d\n, input length %d\n",timeLimits,listLength);
+
+	Date* bucketRanges = calloc(divisions,sizeof(Date));
+	int currentOffset=0;
+	int i=0, index=0;
+
+	//We first make a map of the ranges
+	for(i=0;i<divisions;++i){
+		bucketRanges[i]=  convertEpochToDate(start+(i+1)*timeLimits);
+		printDate(bucketRanges[i]);
+		printf("->Date in Param\n");
+		fflush(stdout);
+	}
+
+	//Now we count how much we should assign to each division, given that DBRow* list
+	for(i=0; i<divisions; ++i){
+		int count=0;
+		outOffsets[i] = currentOffset;
+
+		//While within the bucket range (date<bucketRange[i]) and the list bound, count
+		while(compareDatesExclusive(&(list[index].date),&bucketRanges[i])==-1 && index<listLength){
+			count++;
+			index++;
+
+		}
+		outAmounts[i]=count;
+		currentOffset+=count;
+	}
+
+
+	free(bucketRanges);
 }
 
 void qlog(char* something){

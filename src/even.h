@@ -40,7 +40,7 @@ RowList waitForQueryReply(DB_Context* handle, Query* aQuery);
 RowList processQuery(DB_Context* handle,Query* aQuery, RowList partials);
 
 //Perform a full bucket sort operation such that the Root has the final values!
-RowList bucketSort(DB_Context* handle, DBRow* partials, int partialsLength);
+RowList bucketSort(DB_Context* handle,  Query* aQuery,DBRow* partials, int partialsLength);
 
 //Recycle, free or do any cleanups
 void cleanupAfterQuery(DB_Context* handle, Query* aQuery, RowList partials, RowList finals);

@@ -3,14 +3,11 @@
  *
  */
 #include "odd.h"
-#include "menu.h"
+
 //Our Alarm Signal Handler!
 void notifyIncoming(int sig){
 	//The signal came in. We need to update the table
 	mustUpdateTable = 1;
-
-	//TODO: Remove debug log
-//	qlog("update");
 
 	//More Importantly, set a random time interval between 3 and 5 seconds for the next alarm
 	alarm(rand()%3 + 3);
@@ -18,10 +15,6 @@ void notifyIncoming(int sig){
 
 //Main Function for all odd numbered processes
 void pOdd(DB_Context handle){
-	//TODO: Remove debug log
-//	printf("%d",handle.rank);
-//	qlog("Starting odd_main");
-
 	//Setup some of the working variables
 	char 	filename[50];
 	FILE*	infile;
@@ -43,8 +36,6 @@ void pOdd(DB_Context handle){
 
 	//Open the file
 	sprintf(filename,"data%d.txt",handle.rank/2);
-	printf("opening %s\n",filename);
-	fflush(stdout);
 	infile = fopen(filename,"r");
 	if(infile==NULL){
 		qlog("DID NOT FIND FILE!");
@@ -59,8 +50,6 @@ void pOdd(DB_Context handle){
 
 	//Read some lines. The DB should start with something in its tables!
 	readFromStream(infile,handle.readMax,&memoryTable,&maxCompanyID);
-	printf("max company id: %d\n",maxCompanyID);
-	fflush(stdout);
 
 	//Do an initial non-blocking receive
 	//This sets the op_request variable for the polling loop
@@ -85,7 +74,6 @@ void pOdd(DB_Context handle){
 
 		//If we received a query, handle this one and then do another non-blocking receive
 		if(receivedQuery){
-			qlog("dispatching query");
 			//Say we have the query
 			if(queryDispatcher(&handle, &incomingQuery, &memoryTable)){
 				MPI_Irecv(&incomingQuery,1,handle.query,(handle.rank)-1,0,handle.all,&op_request);
@@ -110,8 +98,6 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 	result.date.year=1994;
 	result.date.month=	9;
 	result.date.day=29;
-
-	qlog("in query");
 
 
 	RowList matchingRows;
@@ -152,23 +138,14 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 void replyToQuery(DB_Context* context, Query* aQuery, DBRow* result, int resultLength){
 	//Send it down the line with a blocking send
 	MPI_Send(result,resultLength,context->row,context->rank-1,0,context->all);
-	printf("sent %d elements\n",resultLength);
-	qlog("Reply sent");
-
-	//TODO: Complete! //I think this is done by now :/
 }
 
 //Find all sales matching the Query's Extended Info. Return a RowList of these entries
 RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
-	//TODO: Complete!
+	//TODO: Remove debug logs
 	RowList retVal;
 	RowList_init(&retVal);
-	printf("table has %d rows\n",table->size);
-	printDate(dates->startDate);
-	printf("\n");
-	printDate(dates->endDate);
-	printf("\n");
-	fflush(stdout);
+
 	int i=0;
 	for(i=0;i<table->size;++i){
 		//Use the utils compare function for this
@@ -191,9 +168,6 @@ RowList findSalesForAllCompanies(RowList* table){
 	RowList container;
 	DBRow* mainRows=calloc(maxCompanyID,sizeof(DBRow));
 	int i=0;
-
-	printf("table has %d rows\n",table->size);
-	printf("max company id is %d\n",maxCompanyID);
 
 	//First we'd want to make sure everyone starts off with 0.0
 	for(i=0;i<maxCompanyID;++i){

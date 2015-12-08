@@ -151,6 +151,12 @@ void printDate(Date aDate){
 	fflush(stdout);
 }
 
+void printDivision(int processnum, int* counts, int* offset, int numProcesses){
+	int i=0;
+	for(i=0;i<numProcesses;++i)
+		printf("P%d->P%d Index offset: %d | Count: %d\n",processnum,i,offset[i],counts[i]);
+}
+
 //Safely write and flush output stream!
 void safeWrite(char* output){
 	printf("%s",output);

@@ -39,6 +39,8 @@ Date promptDateRange(const char* promptPrefix);
 
 void printDate(Date aDate);
 
+void printDivision(int processnum, int* counts, int* offset, int numProcesses);
+
 //Safely write and flush output stream!
 void safeWrite(char* output);
 
