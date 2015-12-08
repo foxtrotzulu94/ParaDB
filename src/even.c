@@ -98,7 +98,7 @@ void forwardQuery(DB_Context* handle, Query* aQuery){
 RowList processQuery(DB_Context* handle,Query* aQuery, RowList partials){
 	//For a sales by date query, we need to bucket sort
 	if(aQuery->type==SALES_BY_DATE){
-		//TODO: IMPLEMENT BUCKET SORT AND UNCOMMENT
+		//TODO: FIX BUCKET SORT
 		printf("Processing %d rows in query\n",partials.size);
 		safeWrite("PROCESSING DATES!");
 		return bucketSort(handle,aQuery,partials.rows,partials.size);
@@ -117,6 +117,7 @@ RowList processQuery(DB_Context* handle,Query* aQuery, RowList partials){
 			//Make an exact copy of the significant info
 			for(i=0;i<maxRounds;++i){
 				reduced[i].company_id=i+1;
+				strcpy(&(reduced[i].company_name),&(partials.rows[i].company_name));
 			}
 		}
 

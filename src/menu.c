@@ -47,7 +47,6 @@ void printQueryInProcess(){
 
 //Prints the resulting DBRows of a given Query
 void printQueryResults(Query query, DBRow* result, int length){
-	//TODO: Format printing
 	printf("\nReturned %d rows\n\n",length);
 	fflush(stdout);
 	switch(query.type){
@@ -80,8 +79,7 @@ void drawMenu(){
 }
 
 void printSalesByAllCompanies(DBRow* result, int length){
-	//TODO: Change for company names when available!
-	printf("Company\t\tTotal\n\n");
+	printf("\t\tCompany\t\tTotal\n\n");
 	fflush(stdout);
 	int i=0;
 	for(i=0;i<length;++i){
@@ -92,8 +90,7 @@ void printSalesByAllCompanies(DBRow* result, int length){
 }
 
 void printCompanySales(DBRow* result){
-	//TODO: CHANGE for company name when possible!
-	printf("%d\t\t%f",result->company_id,result->sales_total);
+	printf("%28s\t%9.2lf",result->company_name,result->sales_total);
 	fflush(stdout);
 }
 

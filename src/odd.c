@@ -180,8 +180,8 @@ RowList findSalesForAllCompanies(RowList* table){
 	for(i=0;i<table->size;++i){
 		companyID = table->rows[i].company_id;
 		mainRows[companyID-1].sales_total+=table->rows[i].sales_total;
-		//TODO: Assign company name if needed as well
 		//We won't assign date or other variables since they are not needed...
+		strcpy(&(mainRows[companyID-1].company_name),&(table->rows[i].company_name));
 	}
 	fflush(stdout);
 

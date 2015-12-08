@@ -67,13 +67,12 @@ void configureDateType(MPI_Datatype* date){
 
 //Configure and serialize the Database Row datatype
 void configureRowType(MPI_Datatype* date, MPI_Datatype* row){
-	//TODO: Fix the Company name problem (see the comment in the typedef DBRows at db_types.h)
 	//Ideally, we would leave the Company ID as a sort of Foreign Key into a separate table.
 	//In essence, we'll fix the amount here
-	const int numElements=4;
-	int numBlocks[4]={1,1,1,1};
-	MPI_Aint displacements[4]={offsetof(DBRow,sales_id),offsetof(DBRow,date),offsetof(DBRow,company_id),offsetof(DBRow,sales_total)};
-	MPI_Datatype usedTypes[4]={MPI_UNSIGNED,*date,MPI_UNSIGNED,MPI_FLOAT};
+	const int numElements=5;
+	int numBlocks[5]={1,1,1,50,1};
+	MPI_Aint displacements[5]={offsetof(DBRow,sales_id),offsetof(DBRow,date),offsetof(DBRow,company_id),offsetof(DBRow,company_name),offsetof(DBRow,sales_total)};
+	MPI_Datatype usedTypes[5]={MPI_UNSIGNED,*date,MPI_UNSIGNED,MPI_CHAR,MPI_FLOAT};
 	MPI_Type_create_struct(numElements,numBlocks,displacements,usedTypes,row);
 	MPI_Type_commit(row);
 }
