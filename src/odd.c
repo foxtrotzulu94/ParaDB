@@ -3,7 +3,7 @@
  *
  */
 #include "odd.h"
-
+#include "menu.h"
 //Our Alarm Signal Handler!
 void notifyIncoming(int sig){
 	//The signal came in. We need to update the table
@@ -25,7 +25,7 @@ void pOdd(DB_Context handle){
 	//Setup some of the working variables
 	char 	filename[50];
 	FILE*	infile;
-	RowList	myList;
+	RowList	memoryTable;
 
 	Query incomingQuery;
 	MPI_Request op_request;
@@ -39,10 +39,12 @@ void pOdd(DB_Context handle){
 	maxCompanyID = 0;
 
 	//Make a new dynamic list
-	RowList_init(&myList);
+	RowList_init(&memoryTable);
 
 	//Open the file
-	sprintf(filename,"data%d.txt",handle.rank-1);
+	sprintf(filename,"data%d.txt",handle.rank/2);
+	printf("opening %s\n",filename);
+	fflush(stdout);
 	infile = fopen(filename,"r");
 	if(infile==NULL){
 		qlog("DID NOT FIND FILE!");
@@ -56,7 +58,7 @@ void pOdd(DB_Context handle){
 
 
 	//Read some lines. The DB should start with something in its tables!
-	readFromStream(infile,handle.readMax,&myList,&maxCompanyID);
+	readFromStream(infile,handle.readMax,&memoryTable,&maxCompanyID);
 	printf("max company id: %d\n",maxCompanyID);
 	fflush(stdout);
 
@@ -78,19 +80,19 @@ void pOdd(DB_Context handle){
 		//if we have to update the table, read some lines and reset the flag
 		if(mustUpdateTable){
 			mustUpdateTable=0;
-			readFromStream(infile,handle.readMax,&myList,&maxCompanyID);
+			readFromStream(infile,handle.readMax,&memoryTable,&maxCompanyID);
 		}
 
 		//If we received a query, handle this one and then do another non-blocking receive
 		if(receivedQuery){
 			qlog("dispatching query");
 			//Say we have the query
-			if(queryDispatcher(&handle, &incomingQuery, &myList)){
+			if(queryDispatcher(&handle, &incomingQuery, &memoryTable)){
 				MPI_Irecv(&incomingQuery,1,handle.query,(handle.rank)-1,0,handle.all,&op_request);
 			}
 			else{
 				//If the Query was an exit message. Cleanup and return to main!
-				RowList_terminate(&myList);
+				RowList_terminate(&memoryTable);
 				close(infile);
 				break;
 			}
@@ -119,18 +121,16 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 	case SALES_BY_COMPANY:
 		//Route to the routine and then send the results back directly
 		//TODO: COMPLETE. Right now it'll just ACK back
-		findSalesForAllCompanies(table);
+		matchingRows = findSalesForAllCompanies(table);
 		qlog("found companies");
 		//Just an ACK to test back
-		replyToQuery(context, aQuery,&result,1);
+		replyToQuery(context, aQuery,matchingRows.rows,matchingRows.size);
 		return 1;
 
 	case SALES_BY_DATE:
-		//Hand off the added info.
-		//TODO: we're debugging this. it should be straightforward to return
+		//Find and send all the rows that match the dates.
 		matchingRows = findSalesInDateRange(&(aQuery->conditions),table);
 		qlog("found sales by dates");
-
 		replyToQuery(context, aQuery,matchingRows.rows,matchingRows.size);
 		return 1;
 
@@ -152,6 +152,7 @@ void replyToQuery(DB_Context* context, Query* aQuery, DBRow* result, int resultL
 	MPI_Send(result,resultLength,context->row,context->rank-1,0,context->all);
 	printf("sent %d elements\n",resultLength);
 	qlog("Reply sent");
+
 	//TODO: Complete! //I think this is done by now :/
 }
 
@@ -161,6 +162,10 @@ RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
 	RowList retVal;
 	RowList_init(&retVal);
 	printf("table has %d rows\n",table->size);
+	printDate(dates->startDate);
+	printf("\n");
+	printDate(dates->endDate);
+	printf("\n");
 	fflush(stdout);
 	int i=0;
 	for(i=0;i<table->size;++i){
@@ -179,10 +184,31 @@ RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
 }
 
 //Return a list of DBRows (one per company) with the total  amounts of their sales.
-DBRow* findSalesForAllCompanies(RowList* table){
-	//TODO: Complete!
+RowList findSalesForAllCompanies(RowList* table){
+	//What we're trying to do here is a makeshift dictionary. We expect that
+	RowList container;
+	DBRow* mainRows=calloc(maxCompanyID,sizeof(DBRow));
+	int i=0;
+
 	printf("table has %d rows\n",table->size);
 	printf("max company id is %d\n",maxCompanyID);
+
+	//First we'd want to make sure everyone starts off with 0.0
+	for(i=0;i<maxCompanyID;++i){
+		mainRows[i].sales_total=0;
+		mainRows[i].company_id=i+1;
+	}
+
+	//Now we want to fill in the cells with the correct info
+	int companyID=1; //Note we are GUARANTEED companyID=0 does not exist
+	for(i=0;i<table->size;++i){
+		companyID = table->rows[i].company_id;
+		mainRows[companyID-1].sales_total+=table->rows[i].sales_total;
+		//TODO: Assign company name if needed as well
+		//We won't assign date or other variables since they are not needed...
+	}
 	fflush(stdout);
-	return NULL;
+
+	RowList_fit(&container,mainRows,maxCompanyID);
+	return container;
 }

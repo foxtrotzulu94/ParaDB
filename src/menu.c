@@ -26,6 +26,10 @@ Query requestUserInput(){
 			userInput.type=SALES_BY_DATE;
 			userInput.conditions.startDate = promptDateRange("Starting");
 			userInput.conditions.endDate = promptDateRange("End");
+			printDate(userInput.conditions.startDate);
+			printf("\n");
+			printDate(userInput.conditions.endDate);
+			safeWrite("\n");
 			return userInput;
 		case 3:
 			userInput.type=EXIT;
@@ -82,6 +86,7 @@ void printSalesByAllCompanies(DBRow* result, int length){
 	int i=0;
 	for(i=0;i<length;++i){
 		printCompanySales(&(result[i]));
+		safeWrite("\n");
 	}
 	safeWrite("\n");
 }

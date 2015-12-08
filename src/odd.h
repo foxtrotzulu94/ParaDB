@@ -53,6 +53,6 @@ void replyToQuery(DB_Context* context,Query* aQuery, DBRow* result, int resultLe
 RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table);
 
 //Return a list of DBRows (one per company) with the total  amounts of their sales.
-DBRow* findSalesForAllCompanies(RowList* table);
+RowList findSalesForAllCompanies(RowList* table);
 
 #endif /* ODD_H_ */
