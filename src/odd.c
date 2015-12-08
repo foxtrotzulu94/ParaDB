@@ -117,22 +117,21 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 	RowList matchingRows;
 
 	switch(aQuery->type){
+	//Route to the routine and then send the results back directly
 
 	case SALES_BY_COMPANY:
-		//Route to the routine and then send the results back directly
-		//TODO: COMPLETE. Right now it'll just ACK back
+		//Find all company, sum their sales and then send it back!
 		matchingRows = findSalesForAllCompanies(table);
 		qlog("found companies");
-		//Just an ACK to test back
-		replyToQuery(context, aQuery,matchingRows.rows,matchingRows.size);
-		return 1;
+
+		break;
 
 	case SALES_BY_DATE:
 		//Find and send all the rows that match the dates.
 		matchingRows = findSalesInDateRange(&(aQuery->conditions),table);
 		qlog("found sales by dates");
-		replyToQuery(context, aQuery,matchingRows.rows,matchingRows.size);
-		return 1;
+
+		break;
 
 	case EXIT:
 		//Begin cleaning up!
@@ -143,6 +142,9 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 		//We're just going to do nothing and wait for the next one.
 		return 1;
 	}
+	replyToQuery(context, aQuery,matchingRows.rows,matchingRows.size);
+	RowList_terminate(&matchingRows);
+	return 1;
 }
 
 //Sends the results of a query back to the Even Numbered Process.
