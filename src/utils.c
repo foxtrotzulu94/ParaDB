@@ -174,7 +174,7 @@ long long convertDateToEpoch(Date* date){
 	cDate.tm_year = (date->year)-1900;
 	cDate.tm_mon = (date->month)-1;
 	cDate.tm_mday = date->day;
-	printf("converting from %s\n",asctime(&cDate));
+
 	epochTime = mktime(&cDate);
 
 	retVal = (long long) epochTime;
@@ -200,7 +200,6 @@ void getAllToAllParameters(long long start, long long end, int divisions, DBRow*
 	//Adapted from our assignment 3
 	//We've once more assumed that outAmounts and outOffsets are of "divisions" length
 	long long timeLimits = (end-start)/divisions;
-	printf("time limits %d\n, input length %d\n",timeLimits,listLength);
 
 	Date* bucketRanges = calloc(divisions+1,sizeof(Date));
 	int currentOffset=0;
@@ -238,19 +237,21 @@ RowList sumAllSalesForDate(DBRow* list, int listLength){
 	RowList retVal;
 	RowList_init(&retVal);
 
-	int i=0;
-	float dateTotals=0.0;
-	int currentIndex=0;
 	Date thisDate;
 	thisDate.day=0;
 	thisDate.month=0;
 	thisDate.year=0;
+
+	int i=0;
+	float dateTotals=0.0;
+	int currentIndex=0;
+
 	for(i=0;i<listLength;++i){
 
 		if(compareDatesExclusive(&thisDate,&list[i].date)!=0){
 			RowList_push_back(&retVal,list[i]);
 
-			if(dateTotals > 0.01 ){
+			if(dateTotals > 0 ){
 				retVal.rows[currentIndex].sales_total=dateTotals;
 				dateTotals=0.0;
 				currentIndex++;
@@ -258,10 +259,13 @@ RowList sumAllSalesForDate(DBRow* list, int listLength){
 
 			thisDate=list[i].date;
 		}
-		else{
-			dateTotals += list[i].sales_total;
-		}
 
+		dateTotals += list[i].sales_total;
+
+
+	}
+	if(dateTotals>0){
+		retVal.rows[currentIndex].sales_total=dateTotals;
 	}
 
 	return retVal;

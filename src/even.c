@@ -15,7 +15,7 @@ void pEven(DB_Context* handle){
 	RowList_init(&queryResults);
 	RowList_init(&querySorted);
 
-	while(1){
+//	while(1){
 		//Root shows menu and asks input
 		if(handle->rank==0){
 //			inputQuery = requestUserInput();
@@ -38,7 +38,7 @@ void pEven(DB_Context* handle){
 		MPI_Barrier(handle->coworkers); //Might not be necessary
 
 		forwardQuery(handle,&inputQuery); //send it out
-		if(inputQuery.type==EXIT){ break; } //Leave if needed...
+//		if(inputQuery.type==EXIT){ break; } //Leave if needed...
 		queryResults = waitForQueryReply(handle,&inputQuery); //... Or get it back
 
 		//And process it correctly
@@ -55,7 +55,7 @@ void pEven(DB_Context* handle){
 			RowList_terminate(&queryResults);
 		if(querySorted.size && querySorted.rows!=queryResults.rows)
 			RowList_terminate(&querySorted);
-	}
+//	}
 
 
 }
@@ -164,7 +164,9 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 	if(evenProcessCount==1){
 		//you're done at this step if there's only a single process. No buckets to make
 		qsort(partials,partialsLength,sizeof(DBRow),compareDates);
-		RowList_fit(&retVal,partials,partialsLength);
+		printSalesByDate(partials,partialsLength);
+		retVal=sumAllSalesForDate(partials,partialsLength);
+
 		return retVal;
 	}
 	expectedSendSize = calloc(evenProcessCount,sizeof(int));
@@ -175,7 +177,7 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 
 	//First, initially sort all of the elements
 	qsort(partials,partialsLength,sizeof(DBRow),compareDates);
-
+	printRow(&(partials[partialsLength-1]));
 
 	//Now make the buckets.
 	//Again, this will work only for dates. If we needed to extend this program, this would get delegated to its own function.
@@ -188,16 +190,12 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 
 	//Send these parameters
 	//Tell them the size...
-	int stats;
-	MPI_Barrier(handle->coworkers);
-
 	MPI_Alltoall(&expectedSendSize[0],1,MPI_INT,&expectedReceiveSize[0],1,MPI_INT,handle->coworkers);
 
 	//...And expected offsets in advance
 	MPI_Alltoall(offsetsSend,1,MPI_INT,offsetsReceive,1,MPI_INT,handle->coworkers);
 
-	printf("MPI_ALLTOALL2: %d\n",stats);
-	MPI_Barrier(handle->coworkers);
+
 	//This allows you to allocate accordingly
 	for(i=0;i<evenProcessCount;++i){
 		bucketedLength+=expectedReceiveSize[i];
@@ -209,6 +207,7 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 
 	//Sort your new stuff locally
 	qsort(bucketed,bucketedLength,sizeof(DBRow),compareDates);
+	printRow(&(partials[partialsLength-1]));
 
 	//TODO: Actually go through each one of the dates and add their sales totals!
 	// Everything below works, it's just that we never went ahead and summed the totals for each date involved
