@@ -99,8 +99,10 @@ void printSalesByDate(DBRow* result, int length){
 	fflush(stdout);
 	int i=0;
 	for(i=0;i<length;++i){
-		printDate(result[i].date);
-		printf("\t\t%f\n",result[i].sales_total);
+		if(result[i].sales_total!=0.0 && dateIsValid(&result[i].date)){
+			printDate(result[i].date);
+			printf("\t\t%f\n",result[i].sales_total);
+		}
 	}
 	fflush(stdout);
 }
@@ -151,7 +153,7 @@ void printDate(Date aDate){
 void printDivision(int processnum, int* counts, int* offset, int numProcesses){
 	int i=0;
 	for(i=0;i<numProcesses;++i)
-		printf("P%d->P%d Index offset: %d | Count: %d\n",processnum,i,offset[i],counts[i]);
+		printf("P%d->P%d Index offset: %d | Count: %d\n",processnum,i*2,offset[i],counts[i]);
 }
 
 //Safely write and flush output stream!

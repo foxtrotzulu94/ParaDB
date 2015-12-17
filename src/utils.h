@@ -38,7 +38,10 @@ Date convertEpochToDate(long long epochTime);
 //Return the parameters to do an all to all
 void getAllToAllParameters(long long start, long long end, int divisions, DBRow* list, int listLenght, int* outAmounts, int* outOffsets);
 
-void qlog(char* something);
+RowList sumAllSalesForDate(DBRow* list, int listLength);
 
+int dateIsValid(const Date* aDate);
+
+void qlog(char* something);
 
 #endif /* UTILS_H_ */

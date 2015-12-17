@@ -112,7 +112,7 @@ int queryDispatcher(DB_Context* context, Query* aQuery, RowList* table){
 		break;
 
 	case EXIT:
-		//Begin cleaning up!
+		//Do nothing, just signal it for a return!
 		return 0;
 
 	default:
@@ -134,7 +134,6 @@ void replyToQuery(DB_Context* context, Query* aQuery, DBRow* result, int resultL
 
 //Find all sales matching the Query's Extended Info. Return a RowList of these entries
 RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
-	//TODO: Remove debug logs
 	RowList retVal;
 	RowList_init(&retVal);
 
@@ -148,8 +147,8 @@ RowList findSalesInDateRange(ExtendedInfo* dates, RowList* table){
 			RowList_push_back(&retVal,table->rows[i]);
 		}
 	}
-	printf("reply has %d rows\n",retVal.size);
-		fflush(stdout);
+//	printf("reply has %d rows\n",retVal.size);
+//	fflush(stdout);
 
 	return retVal;
 }

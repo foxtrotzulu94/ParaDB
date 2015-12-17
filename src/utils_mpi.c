@@ -75,7 +75,7 @@ void setWorldInfo(DB_Context* handle){
 void setProcessCoworkers(DB_Context* handle){
 	//We'll be splitting MPI_COMM_WORLD in even and odd.
 	//Each process knows its rank by now, so all we need to do is modulo
-	MPI_Comm_split(MPI_COMM_WORLD,handle->rank %2,1,&(handle->coworkers));
+	MPI_Comm_split(MPI_COMM_WORLD,(handle->rank%2)==0,0,&(handle->coworkers));
 }
 
 //Close the ParaDB System safely. Takes care of freeing context references and custom datatypes

@@ -5,6 +5,7 @@
  *      Author: foxtrot
  */
 #include "db_types.h"
+#include "utils.h"
 #include <stdio.h>
 /**
  *This file contains all functions relevant in drawing to the console

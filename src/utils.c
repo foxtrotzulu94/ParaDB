@@ -202,16 +202,13 @@ void getAllToAllParameters(long long start, long long end, int divisions, DBRow*
 	long long timeLimits = (end-start)/divisions;
 	printf("time limits %d\n, input length %d\n",timeLimits,listLength);
 
-	Date* bucketRanges = calloc(divisions,sizeof(Date));
+	Date* bucketRanges = calloc(divisions+1,sizeof(Date));
 	int currentOffset=0;
 	int i=0, index=0;
 
 	//We first make a map of the ranges
 	for(i=0;i<divisions;++i){
 		bucketRanges[i]=  convertEpochToDate(start+(i+1)*timeLimits);
-		printDate(bucketRanges[i]);
-		printf("->Date in Param\n");
-		fflush(stdout);
 	}
 
 	//Now we count how much we should assign to each division, given that DBRow* list
@@ -231,6 +228,43 @@ void getAllToAllParameters(long long start, long long end, int divisions, DBRow*
 
 
 	free(bucketRanges);
+}
+
+int dateIsValid(const Date* aDate){
+	return aDate->day!=0 && aDate->month!=0 && aDate->year!=0;
+}
+
+RowList sumAllSalesForDate(DBRow* list, int listLength){
+	RowList retVal;
+	RowList_init(&retVal);
+
+	int i=0;
+	float dateTotals=0.0;
+	int currentIndex=0;
+	Date thisDate;
+	thisDate.day=0;
+	thisDate.month=0;
+	thisDate.year=0;
+	for(i=0;i<listLength;++i){
+
+		if(compareDatesExclusive(&thisDate,&list[i].date)!=0){
+			RowList_push_back(&retVal,list[i]);
+
+			if(dateTotals > 0.01 ){
+				retVal.rows[currentIndex].sales_total=dateTotals;
+				dateTotals=0.0;
+				currentIndex++;
+			}
+
+			thisDate=list[i].date;
+		}
+		else{
+			dateTotals += list[i].sales_total;
+		}
+
+	}
+
+	return retVal;
 }
 
 void qlog(char* something){

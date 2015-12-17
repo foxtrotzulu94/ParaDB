@@ -28,8 +28,6 @@ typedef struct{
 	unsigned int sales_id; //Starts at 1
 	Date date;
 	unsigned int company_id; //Starts at 1
-	//TODO: FIX. Company name length cannot be hardcoded! and attaching it to this struct is very costly
-	//		if we plan to send an unknown, large number of rows as a result.
 	char company_name[50]; //Company name is very limited
 	float sales_total;
 } DBRow;

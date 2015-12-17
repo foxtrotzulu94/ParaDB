@@ -18,7 +18,14 @@ void pEven(DB_Context* handle){
 	while(1){
 		//Root shows menu and asks input
 		if(handle->rank==0){
-			inputQuery = requestUserInput();
+//			inputQuery = requestUserInput();
+			inputQuery.type=SALES_BY_DATE;
+			inputQuery.conditions.startDate.year=2012;
+			inputQuery.conditions.startDate.month=1;
+			inputQuery.conditions.startDate.day=1;
+			inputQuery.conditions.endDate.year=2015;
+			inputQuery.conditions.endDate.month=1;
+			inputQuery.conditions.endDate.day=1;
 			if(inputQuery.type==EXIT){
 				safeWrite("\nThank you for using ParaDB... Good Bye!");
 			}
@@ -34,9 +41,10 @@ void pEven(DB_Context* handle){
 		if(inputQuery.type==EXIT){ break; } //Leave if needed...
 		queryResults = waitForQueryReply(handle,&inputQuery); //... Or get it back
 
-		querySorted = processQuery(handle,&inputQuery,queryResults); //TODO: enter this method and DO BUCKET SORT!
+		//And process it correctly
+		querySorted = processQuery(handle,&inputQuery,queryResults);
 
-		//Root delivers!
+		//To display the results at root
 		if(handle->rank==0){
 			printQueryResults(inputQuery,querySorted.rows,querySorted.size);
 		}
@@ -128,6 +136,7 @@ RowList processQuery(DB_Context* handle,Query* aQuery, RowList partials){
 		}
 
 	}
+
 }
 
 //Perform a full bucket sort operation such that the Root has the final values!
@@ -143,6 +152,7 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 	int* expectedReceiveSize;
 	int* offsetsSend;
 	int* offsetsReceive;
+
 	DBRow* bucketed;
 	int bucketedLength=0;
 	DBRow* finals;
@@ -167,7 +177,6 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 	qsort(partials,partialsLength,sizeof(DBRow),compareDates);
 
 
-
 	//Now make the buckets.
 	//Again, this will work only for dates. If we needed to extend this program, this would get delegated to its own function.
 	Date startDate = aQuery->conditions.startDate;
@@ -177,35 +186,40 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 
 	getAllToAllParameters(startTime, endTime, evenProcessCount,partials,partialsLength,expectedSendSize,offsetsSend);
 
-	printDivision(handle->rank,expectedSendSize,offsetsSend,evenProcessCount); 	//TODO: REMOVE Debug log
-
 	//Send these parameters
 	//Tell them the size...
-	MPI_Alltoall(expectedSendSize,evenProcessCount,MPI_INTEGER,expectedReceiveSize,evenProcessCount,MPI_INTEGER,handle->coworkers);
-	//...And expected offsets in advance
-	MPI_Alltoall(offsetsSend,evenProcessCount,MPI_INTEGER,offsetsReceive,evenProcessCount,MPI_INTEGER,handle->coworkers);
+	int stats;
+	MPI_Barrier(handle->coworkers);
 
+	MPI_Alltoall(&expectedSendSize[0],1,MPI_INT,&expectedReceiveSize[0],1,MPI_INT,handle->coworkers);
+
+	//...And expected offsets in advance
+	MPI_Alltoall(offsetsSend,1,MPI_INT,offsetsReceive,1,MPI_INT,handle->coworkers);
+
+	printf("MPI_ALLTOALL2: %d\n",stats);
+	MPI_Barrier(handle->coworkers);
 	//This allows you to allocate accordingly
 	for(i=0;i<evenProcessCount;++i){
 		bucketedLength+=expectedReceiveSize[i];
-		printf("%d. Expecting %d from P%d\n",handle->rank,expectedReceiveSize[i],i);
-		fflush(stdout);
 	}
 	bucketed = calloc(bucketedLength,sizeof(DBRow));
 
 	//Now, do your personalized all to all to send those partials to them buckets!
-	//TODO: Check from here. Crashed at this call.
 	MPI_Alltoallv(partials,expectedSendSize,offsetsSend,handle->row,bucketed,expectedReceiveSize,offsetsReceive,handle->row,handle->coworkers);
 
 	//Sort your new stuff locally
 	qsort(bucketed,bucketedLength,sizeof(DBRow),compareDates);
 
-
-	printSalesByDate(bucketed, bucketedLength);
+	//TODO: Actually go through each one of the dates and add their sales totals!
+	// Everything below works, it's just that we never went ahead and summed the totals for each date involved
+	RowList summedDates=sumAllSalesForDate(bucketed,bucketedLength);
+	free(bucketed);
+	bucketed = summedDates.rows;
+	bucketedLength = summedDates.size;
 
 	//And finally prepare to Gather at root
 	//Get the final bucket size for each node
-	MPI_Gather(&bucketedLength,1,MPI_INT,expectedReceiveSize,evenProcessCount,MPI_INT,0,handle->coworkers);
+	MPI_Gather(&bucketedLength,1,MPI_INT,expectedReceiveSize,1,MPI_INT,0,handle->coworkers);
 
 	//Prepare the root node
 	if(handle->rank==0){
@@ -216,7 +230,7 @@ RowList bucketSort(DB_Context* handle, Query* aQuery, DBRow* partials, int parti
 		for(i=0;i<evenProcessCount;++i){
 			//Get the running sum
 			expectedBufferSize += expectedReceiveSize[i];
-			printf("Expecting %d from P%d\n",expectedReceiveSize[i],i);
+			printf("Expecting %d from P%d\n",expectedReceiveSize[i],i*2);
 			fflush(stdout);
 			if(i<evenProcessCount-1){ //And also calculate the displacements.
 				offsetsReceive[i+1]=expectedReceiveSize[i]+offsetsReceive[i];
